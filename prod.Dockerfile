@@ -70,4 +70,4 @@ ENV NEXT_PUBLIC_ENV_VARIABLE=${NEXT_PUBLIC_ENV_VARIABLE}
 
 # Note: Don't expose ports here, Compose will handle that for us
 
-CMD ["yarn", "Start"]
+CMD ["yarn", "start"]
