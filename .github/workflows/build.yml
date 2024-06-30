@@ -6,8 +6,8 @@ on:
 env:
   REGISTRY: hub.docker.com
   IMAGE_NAME: "docker261319/bookingnext"
-  ACTOR_NAME: docker261319
-  PWD: asmamemel2619#
+  ACTOR_NAME: "docker261319"
+  PWD: "asmamemel2619#"
 
 jobs:
   amd64:
