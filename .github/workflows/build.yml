@@ -1,28 +1,26 @@
-# For more details, read this: https://coolify.io/docs/github-actions
-name: Build Static Image
+name: Custom CD
+
 on:
-  push:
-    branches: ["main"]
+    push:
+      branches:
+        - main
+
 env:
   REGISTRY: hub.docker.com
   IMAGE_NAME: "docker261319/bookingnext"
-  ACTOR_NAME: "docker261319"
-  PWD: "asmamemel2619#"
 
 jobs:
-  amd64:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    steps:
+    run_pull:
+      name: run pull
+      runs-on: ubuntu-latest
+      
+      steps:
       - uses: actions/checkout@v4
       - name: Login to hub.docker.com
         uses: docker/login-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ env.ACTOR_NAME }}
-          password: ${{ env.PWD  }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build image and push to registry
         uses: docker/build-push-action@v4
         with:
