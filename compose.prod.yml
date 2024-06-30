@@ -13,12 +13,12 @@ services:
     ports:
       - 3000:3000
     networks:
-      - my_network
+      - coolify
 
   # Add more containers below (nginx, postgres, etc.)
 
 # Define a network, which allows containers to communicate
 # with each other, by using their container name as a hostname
-networks:
+coolify:
   my_network:
     external: true

@@ -2,42 +2,51 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Install dependencies based on the preferred package manager
+# Copy all files to the container's working directory
 COPY . .
-# Omit --production flag for TypeScript devDependencies
+
+# Install dependencies based on the preferred package manager
 RUN \
-  if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
-  elif [ -f package-lock.json ]; then npm ci; \
-  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm i; \
-  # Allow install without lockfile, so example works even without Node.js installed locally
-  else echo "Warning: Lockfile not found. It is recommended to commit lockfiles to version control." && yarn install; \
+  if [ -f yarn.lock ]; then \
+    yarn --frozen-lockfile; \
+  elif [ -f package-lock.json ]; then \
+    npm ci; \
+  elif [ -f pnpm-lock.yaml ]; then \
+    corepack enable pnpm && pnpm install; \
+  else \
+    echo "Warning: Lockfile not found. It is recommended to commit lockfiles to version control." && \
+    yarn install; \
   fi
 
-# Environment variables must be present at build time
-# https://github.com/vercel/next.js/discussions/14030
+# Set environment variables for the build process
 ARG ENV_VARIABLE
 ENV ENV_VARIABLE=${ENV_VARIABLE}
 ARG NEXT_PUBLIC_ENV_VARIABLE
 ENV NEXT_PUBLIC_ENV_VARIABLE=${NEXT_PUBLIC_ENV_VARIABLE}
 
-# Next.js collects completely anonymous telemetry data about general usage. Learn more here: https://nextjs.org/telemetry
-# Uncomment the following line to disable telemetry at build time
+# Uncomment the following line to disable Next.js telemetry at build time
 # ENV NEXT_TELEMETRY_DISABLED 1
 
-# Note: Don't expose ports here, Compose will handle that for us
-
-# Build Next.js based on the preferred package manager
+# Build the Next.js application
 RUN \
-  if [ -f yarn.lock ]; then yarn build; \
-  elif [ -f package-lock.json ]; then npm run build; \
-  elif [ -f pnpm-lock.yaml ]; then pnpm build; \
-  else npm run build; \
+  if [ -f yarn.lock ]; then \
+    yarn build; \
+  elif [ -f package-lock.json ]; then \
+    npm run build; \
+  elif [ -f pnpm-lock.yaml ]; then \
+    pnpm build; \
+  else \
+    npm run build; \
   fi
 
-# Start Next.js based on the preferred package manager
+# Set the command to start the Next.js application
 CMD \
-  if [ -f yarn.lock ]; then yarn start; \
-  elif [ -f package-lock.json ]; then npm run start; \
-  elif [ -f pnpm-lock.yaml ]; then pnpm start; \
-  else npm run start; \
+  if [ -f yarn.lock ]; then \
+    yarn start; \
+  elif [ -f package-lock.json ]; then \
+    npm run start; \
+  elif [ -f pnpm-lock.yaml ]; then \
+    pnpm start; \
+  else \
+    npm run start; \
   fi
