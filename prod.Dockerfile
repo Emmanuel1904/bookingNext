@@ -55,4 +55,4 @@ ARG NEXT_PUBLIC_ENV_VARIABLE
 ENV NEXT_PUBLIC_ENV_VARIABLE=${NEXT_PUBLIC_ENV_VARIABLE}
 
 # Command to run the application
-CMD ["node", "server.js"]
+CMD ["yarn", "start"]
