@@ -1,7 +1,7 @@
 # Variables
 NETWORK_NAME=my_network
-COMPOSE_FILE_DEV=docker-compose.dev.yml
-COMPOSE_FILE_PRD=docker-compose.prod.yml
+COMPOSE_FILE_DEV=compose.dev.yml
+COMPOSE_FILE_PRD=compose.prod.yml
 
 # Create Docker network
 .PHONY: network
