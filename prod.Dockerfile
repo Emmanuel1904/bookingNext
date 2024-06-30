@@ -1,69 +1,58 @@
+# Base image with Node.js
 FROM node:18-alpine AS base
 
-# Step 1. Rebuild the source code only when needed
+# Builder stage
 FROM base AS builder
 
 WORKDIR /app
 
 # Install dependencies based on the preferred package manager
 COPY yarn.lock* ./
-# Omit --production flag for TypeScript devDependencies
-RUN \
-  if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
-  # Allow install without lockfile, so example works even without Node.js installed locally
-  else echo "Warning: Lockfile not found. It is recommended to commit lockfiles to version control." && yarn install; \
-  fi
+RUN if [ -f yarn.lock ]; then \
+      yarn --frozen-lockfile; \
+    else \
+      echo "Warning: Lockfile not found. It is recommended to commit lockfiles to version control." && \
+      yarn install; \
+    fi
 
+# Copy application source code
 COPY src ./src
 COPY public ./public
 COPY next.config.mjs .
 COPY tsconfig.json .
 
-# Environment variables must be present at build time
-# https://github.com/vercel/next.js/discussions/14030
+# Set build-time environment variables
 ARG ENV_VARIABLE
 ENV ENV_VARIABLE=${ENV_VARIABLE}
 ARG NEXT_PUBLIC_ENV_VARIABLE
 ENV NEXT_PUBLIC_ENV_VARIABLE=${NEXT_PUBLIC_ENV_VARIABLE}
 
-# Next.js collects completely anonymous telemetry data about general usage. Learn more here: https://nextjs.org/telemetry
-# Uncomment the following line to disable telemetry at build time
-# ENV NEXT_TELEMETRY_DISABLED 1
-
-# Build Next.js based on the preferred package manager
+# Build the application
 RUN if [ -f yarn.lock ]; then \
       yarn build; \
     else \
       npm run build; \
     fi
 
-# Note: It is not necessary to add an intermediate step that does a full copy of `node_modules` here
-
-# Step 2. Production image, copy all the files and run next
+# Production image
 FROM base AS runner
 
 WORKDIR /app
 
-# Don't run production as root
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+# Create non-root user
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
 USER nextjs
 
-COPY --from=builder /public ./public
+# Copy built assets from builder
+COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Automatically leverage output traces to reduce image size
-# https://nextjs.org/docs/advanced-features/output-file-tracing
-COPY --from=builder --chown=nextjs:nodejs /.next/static ./.next/static
-
-# Environment variables must be redefined at run time
+# Set runtime environment variables
 ARG ENV_VARIABLE
 ENV ENV_VARIABLE=${ENV_VARIABLE}
 ARG NEXT_PUBLIC_ENV_VARIABLE
 ENV NEXT_PUBLIC_ENV_VARIABLE=${NEXT_PUBLIC_ENV_VARIABLE}
 
-# Uncomment the following line to disable telemetry at run time
-# ENV NEXT_TELEMETRY_DISABLED 1
-
-# Note: Don't expose ports here, Compose will handle that for us
-
+# Command to run the application
 CMD ["node", "server.js"]
