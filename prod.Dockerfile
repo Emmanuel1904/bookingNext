@@ -45,7 +45,7 @@ RUN addgroup --system --gid 1001 nodejs && \
 USER nextjs
 
 # Copy built assets from builder
-COPY --from=builder /public ./public
+COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 # Set runtime environment variables
