@@ -7,7 +7,7 @@ FROM base AS builder
 WORKDIR /app
 
 # Install dependencies based on the preferred package manager
-COPY yarn.lock* ./
+COPY package.json yarn.lock* ./
 RUN if [ -f yarn.lock ]; then \
       yarn --frozen-lockfile; \
     else \
