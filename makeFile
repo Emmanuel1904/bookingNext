@@ -1,6 +1,7 @@
 # Variables
 NETWORK_NAME=my_network
 COMPOSE_FILE_DEV=docker-compose.dev.yml
+COMPOSE_FILE_PRD=docker-compose.prod.yml
 
 # Create Docker network
 .PHONY: network
@@ -17,12 +18,27 @@ build-dev:
 up-dev:
 	docker compose -f $(COMPOSE_FILE_DEV) up
 
+# Build development environment
+.PHONY: build-prod
+build-prod:
+	docker compose -f $(COMPOSE_FILE_PROD) build
+
+# Bring up development environment
+.PHONY: up-prod
+up-dev:
+	docker compose -f $(COMPOSE_FILE_PROD) up
+
 # Clean up Docker network
 .PHONY: clean
 clean:
 	docker network rm $(NETWORK_NAME)
 
-init_global:
+init_global_dev:
 	make network
 	make build-dev
 	make up-dev
+
+init_global_prod:
+	make network
+	make build-prod
+	make up-prod
