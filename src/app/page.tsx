@@ -1,4 +1,17 @@
+'use client'
+
 import Image from "next/image";
+import { useState } from 'react';
+
+function Counter(){
+  const [count, setCount] = useState(0)
+  return (
+    <>
+      <div>{count}</div>
+      <button onClick={ () => setCount(count + 1) }>Click Me!</button>
+    </>
+  )
+}
 
 export default function Home() {
   return (
@@ -38,6 +51,8 @@ export default function Home() {
           priority
         />
       </div>
+
+      <Counter></Counter>
 
       <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
         <a
